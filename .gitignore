@@ -1,0 +1,8 @@
+# Java/Maven/IntelliJ
+target/
+.idea/
+*.iml
+out/
+.DS_Store
+# Docker
+.env
