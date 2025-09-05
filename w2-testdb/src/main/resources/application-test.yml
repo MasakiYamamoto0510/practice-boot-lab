@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    datasource:
+      driver-class-name: org.postgresql.Driver
+    properties:
+      hibernate.format_sql: true # 見やすくする（任意）
+      hibernate.generate_statistics: true
+
+# SQLとバインド値を出す（クエリ数を”体感”）
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace

@@ -1,46 +1,87 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot が依存のバージョンや Maven プラグインを管理 -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.3</version>
-        <relativePath/> <!-- IntelliJで拾いやすくする -->
+        <relativePath/>
     </parent>
 
     <groupId>com.example</groupId>
     <artifactId>w2-testdb</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <properties>
+        <!-- Java 21 を使う（compiler plugin などは親が面倒見ます） -->
         <java.version>21</java.version>
     </properties>
 
     <dependencies>
-        <!-- まずは起動＋テストだけ（JPA/FlywayはSTEP3以降で追加） -->
+        <!-- 最低限の Boot（ロギング、起動まわり等の基盤） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- JPA（Hibernate）本体。実 DB はドライバで切り替える -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- ▼ 本番想定 DB ドライバ：PostgreSQL
+             - scope=runtime: アプリ起動時（本番/テスト起動時）に必要、コンパイル時は不要
+             - 統合テスト(@SpringBootTest + Testcontainers)で必須 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
+        <!-- ▼（任意/今回は残す）H2：@DataJpaTest などの軽量スライステスト用
+             - scope=test: テストのときだけクラスパスに載る
+             - 統合テストでは @AutoConfigureTestDatabase(replace=NONE) で H2 差替えを禁止しておく -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ▼ Spring Boot の Testcontainers サポート（ライフサイクル/ユーティリティ）
+             - バージョンは親 (3.3.3) が管理 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ▼ Testcontainers：JUnit 連携 -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ▼ Testcontainers：PostgreSQL コンテナ（jdbcUrl などを提供） -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ▼ JUnit/AssertJ を含む Spring の標準テストスタータ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Boot アプリのパッケージングと再実行サポート -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
